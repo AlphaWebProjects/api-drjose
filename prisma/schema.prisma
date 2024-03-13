@@ -7,19 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Cliente {
+model Example {
   id        Int      @id @default(autoincrement())
   nome      String
   sobrenome String
   email     String   @unique
   idade     Int
 }
-
-model Produto {
-  id              Int      @id @default(autoincrement())
-  nome            String
-  descricao       String
-  preco           Decimal  @db.Decimal(10, 2)
-  data_atualizado DateTime @updatedAt
-}
-
