@@ -5,6 +5,7 @@ import express, { Express } from "express";
 import "express-async-errors";
 
 import { authRouter } from "./routers/auth-router";
+import { enrollmentRouter } from "./routers/enrollment-router";
 
 loadEnv();
 
@@ -14,5 +15,6 @@ app
   .use(express.json())
   .get("/health", (_req, res) => res.send("OK!"))
   .use("/user", authRouter)
+  .use("/user", enrollmentRouter)
 
 export default app;

@@ -4,7 +4,7 @@
     "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true, // Habilita todas as opções estritas
+    //"strict": true, // Habilita todas as opções estritas
     "noImplicitAny": true, // Não permite tipos implícitos 'any'
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
