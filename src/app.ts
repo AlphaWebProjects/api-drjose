@@ -4,7 +4,7 @@ import express, { Express } from "express";
 
 import "express-async-errors";
 
-import { exampleRouter } from "./routers/example-router";
+import { authRouter } from "./routers/auth-router";
 
 loadEnv();
 
@@ -13,6 +13,6 @@ app
   .use(cors())
   .use(express.json())
   .get("/health", (_req, res) => res.send("OK!"))
-  .use("/example", exampleRouter)
+  .use("/user", authRouter)
 
 export default app;

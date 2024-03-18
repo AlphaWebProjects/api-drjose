@@ -1,1 +1,1 @@
-export * from "./example-router"
+export * from "./auth-router"

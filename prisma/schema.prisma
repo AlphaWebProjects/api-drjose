@@ -1,5 +1,5 @@
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -7,10 +7,55 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Example {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  sobrenome String
-  email     String   @unique
-  idade     Int
+model user {
+  id            Int      @id @default(autoincrement())
+  name          String
+  password      String
+  email         String   @unique
+
+  session       session[]
+  enrollment    enrollment[]
+}
+
+model session {
+  id          Int       @id @default(autoincrement())
+  userId      Int       
+  token       String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isActive    Boolean   @default(true)
+
+  user        user?     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model admin {
+  id            Int      @id @default(autoincrement())
+  name          String
+  password      String
+  email         String   @unique
+  adminSession  adminSession[]
+
+}
+
+model adminSession {
+  id          Int       @id @default(autoincrement())
+  adminId      Int       
+  token       String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isActive    Boolean   @default(true)
+
+  admin        admin?     @relation(fields: [adminId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model enrollment {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @unique
+  cpf         String    @unique
+  birthday    String
+  phone       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        user?     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
