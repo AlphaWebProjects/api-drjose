@@ -13,9 +13,7 @@ model User {
   password    String
   email       String      @unique
   role        UserRole    @default(USER)
-  cpf         String      @unique
-  birthday    String
-  phone       String
+  
   sessions    Session[]
   enrollments Enrollment[]
 }
@@ -34,6 +32,9 @@ model Session {
 model Enrollment {
   id        Int       @id @default(autoincrement())
   userId    Int       @unique
+  cpf       String    @unique
+  birthday  String
+  phone     String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
