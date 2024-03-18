@@ -21,8 +21,8 @@ async function findUniqueByEmail(email: string){
 }
 
 async function insertUser(body: Omit<userBody, "id">){
-    const result = await prisma.user.findUnique({
-        where: {
+    const result = await prisma.user.create({
+        data: {
             email: body.email,
             name: body.name,
             password: body.password,
