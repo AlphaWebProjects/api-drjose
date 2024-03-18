@@ -7,55 +7,40 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model user {
-  id            Int      @id @default(autoincrement())
-  name          String
-  password      String
-  email         String   @unique
-
-  session       session[]
-  enrollment    enrollment[]
-}
-
-model session {
-  id          Int       @id @default(autoincrement())
-  userId      Int       
-  token       String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  isActive    Boolean   @default(true)
-
-  user        user?     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model admin {
-  id            Int      @id @default(autoincrement())
-  name          String
-  password      String
-  email         String   @unique
-  adminSession  adminSession[]
-
-}
-
-model adminSession {
-  id          Int       @id @default(autoincrement())
-  adminId      Int       
-  token       String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  isActive    Boolean   @default(true)
-
-  admin        admin?     @relation(fields: [adminId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-model enrollment {
-  id          Int       @id @default(autoincrement())
-  userId      Int       @unique
-  cpf         String    @unique
+model User {
+  id          Int         @id @default(autoincrement())
+  name        String
+  password    String
+  email       String      @unique
+  role        UserRole    @default(USER)
+  cpf         String      @unique
   birthday    String
   phone       String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  sessions    Session[]
+  enrollments Enrollment[]
+}
 
-  user        user?     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Session {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  token     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isActive  Boolean   @default(true)
+
+  user      User?     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Enrollment {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User?     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
