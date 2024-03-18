@@ -1,22 +1,35 @@
 import { AuthenticatedAdminRequest } from "@/middlewares/authenticationAdmin-middlerare";
-import { userBody } from "@/schemas/user-schema";
-import exampleService from "@/services/example-service";
-
+import { UserRole, userBody, authSCHEMA } from "@/schemas/auth-schema";
+import authService from "@/services/auth-service";
+import bcrypt from 'bcrypt'
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 
 export async function createUser(req: Request, res: Response){
-    try {        
+    try {    
+        const isValid = authSCHEMA.createUser.validate(req.body, {abortEarly: false})
 
-        //validar com joi
+        if(isValid.error){
+            console.log(isValid.error)
+            return res.sendStatus(httpStatus.BAD_REQUEST)
+        }
 
         const {name, email, password, role}: Omit<userBody, "id"> = req.body
 
-        //se ja tiver 1 admin, nao deve ser possivel ter outro
-        
-        //verifica se ja possui um email
+        if (role === UserRole.ADMIN){
+            const hasAdmin = authService.getUniqueAdmin()
+            if (hasAdmin){
+                return res.sendStatus(httpStatus.CONFLICT)
+            }
+        }
 
-        //cria o usuario
+        const hasEmail = await authService.getUniqueByEmail(email)
+
+        if (hasEmail){
+            return res.sendStatus(httpStatus.CONFLICT)
+        }
+        
+        const userData = await authService.createUser({name, email, password, role})
 
         return res.sendStatus(httpStatus.CREATED)
         
@@ -29,19 +42,28 @@ export async function createUser(req: Request, res: Response){
 
 export async function createSession(req: Request, res: Response){
     try {        
+        const isValid = authSCHEMA.createSession.validate(req.body, {abortEarly: false})
 
-        //validar com joi
+        if(isValid.error){
+            console.log(isValid.error)
+            return res.sendStatus(httpStatus.BAD_REQUEST)
+        }
 
         const {email, password}: Omit<userBody, "id" | "name" | "role"> = req.body
 
-        //buscar pelo email
+        const hasUser = await authService.getUniqueByEmail(email)
+
+        if (!hasUser){
+            return res.sendStatus(httpStatus.NOT_FOUND)
+        }
         
-        //verifica se a senha é valida
+        const isValidPassword = bcrypt.compareSync(password, hasUser.password)
 
-        //criar a sessão
-        //retorna o token
+        if(!isValidPassword){
+            return res.sendStatus(httpStatus.UNAUTHORIZED)
+        }
 
-        const token = "token"
+        const { token } = await authService.createSession(hasUser.id)
 
         return res.send(token).status(httpStatus.CREATED)
         
@@ -53,10 +75,7 @@ export async function createSession(req: Request, res: Response){
 }
 export async function getAllUsers(req: AuthenticatedAdminRequest, res: Response){
     try {        
-        
-        //buscar por todos usuarios com o cargo "USER"
-
-        const allUsers = [""]
+        const allUsers = await authService.getAllUsers()
 
         return res.send(allUsers).status(httpStatus.CREATED)
         
